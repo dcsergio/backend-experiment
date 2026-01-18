@@ -14,7 +14,7 @@ spring:
     name: restserver
 
 server:
-  port: 8080
+  port: 8443
   ssl:
     enabled: false
     # need to add your own domain's certificate
