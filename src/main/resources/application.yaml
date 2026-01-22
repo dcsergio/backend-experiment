@@ -4,7 +4,7 @@ spring:
     driver-class-name: org.sqlite.JDBC
   data:
     mongodb:
-      uri: mongodb://localhost:27017/vouchers
+      uri: ${MONGO_DB_URL}/vouchers
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     hibernate:
