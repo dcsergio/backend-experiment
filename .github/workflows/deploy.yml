@@ -1,0 +1,65 @@
+name: CI/CD Backend Spring Boot
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
+      - name: Deploy to Oracle Cloud via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.OCI_HOST }}
+          username: ${{ secrets.OCI_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Installa Docker se non presente (opzionale se l'hai già fatto)
+            if ! [ -x "$(command -v docker)" ]; then
+              sudo apt-get update && sudo apt-get install -y docker.io
+            fi
+            
+            # Fermo il container precedente se esiste
+            sudo docker stop spring-backend || true
+            sudo docker rm spring-backend || true
+            
+            # Mi sposto nella cartella dell'app
+            mkdir -p ~/app
+            
+      - name: Transfer JAR to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.OCI_HOST }}
+          username: ${{ secrets.OCI_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "build/libs/*.jar"
+          target: "~/app"
+          strip_components: 2
+
+      - name: Run Application on Oracle Cloud
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.OCI_HOST }}
+          username: ${{ secrets.OCI_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo docker run -d \
+              --name spring-backend \
+              -p 8080:8080 \
+              -e DB_URL='${{ secrets.DB_URL }}' \
+              -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
+              -e DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+              openjdk:21-jdk-slim java -jar ~/app/*.jar
