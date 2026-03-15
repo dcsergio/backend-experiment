@@ -1,20 +1,23 @@
 spring:
   datasource:
-    url: jdbc:sqlite:telegram.db
-    driver-class-name: org.sqlite.JDBC
-  data:
-    mongodb:
-      uri: ${MONGO_DB_URL:mongodb://localhost:27017}/vouchers
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
   jpa:
-    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        # 2. FONDAMENTALE: Forza Hibernate a usare sedapp per la generazione del DDL
+        default_schema: sedapp
+        # Aiuta a gestire i nomi degli oggetti nello schema specifico
+        jdbc.lob.non_contextual_creation: true
     hibernate:
       ddl-auto: update
-    show-sql: true
-  application:
-    name: restserver
 
 server:
-  port: 8443
+  port: 8080
   ssl:
     enabled: false
     # need to add your own domain's certificate

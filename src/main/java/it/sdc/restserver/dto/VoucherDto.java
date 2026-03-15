@@ -7,7 +7,7 @@ import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record VoucherDto(
-        String id,
+        Long id,
         String code,
         Double amount,
         String signature,
