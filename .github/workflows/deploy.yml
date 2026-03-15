@@ -62,4 +62,8 @@ jobs:
               -e DB_URL='${{ secrets.DB_URL }}' \
               -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
               -e DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+              -e TELEGRAM_BOT_TOKEN='${{ secrets.TELEGRAM_BOT_TOKEN }}' \
+              -e BOT_USERNAME='${{ secrets.BOT_USERNAME }}' \
+              -e KEYSTORE_PATH='${{ secrets.KEYSTORE_PATH }}' \
+              -e SSL_KEYSTORE_PASSWORD='${{ secrets.SSL_KEYSTORE_PASSWORD }}' \
               openjdk:21-jdk-slim java -jar ~/app/*.jar
